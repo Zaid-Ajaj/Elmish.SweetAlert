@@ -8,13 +8,16 @@ var resolve = function(dir) {
 
 var packageContents = fs.readFileSync(resolve("package.json"));
 var package = JSON.parse(packageContents);
+var packageUrl = package.repository.url; 
+
+console.log("Publishing to " + packageUrl); 
 
 ghPages.publish("public", {
-    repo: package.repository.url
+    repo: packageUrl
 }, function(e) {
     if (e === undefined) {
         console.log("Finished publishing succesfully");
     } else {
-        console.log("Error occured while publishing :(");
+        console.log("Error occured while publishing :(", e);
     }
 });

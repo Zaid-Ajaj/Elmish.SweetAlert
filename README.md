@@ -1,4 +1,4 @@
-# Elmish.SweetAlert [![Nuget](https://img.shields.io/nuget/v/Elmish.SweetAlert.svg?colorB=green)](https://www.nuget.org/packages/Elmish.SweetAlert)
+# Elmish.SweetAlert [![Nuget](https://img.shields.io/nuget/v/Elmish.SweetAlert.svg?colorB=green)](https://www.nuget.org/packages/Elmish.SweetAlert) [![Build Status](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert.svg?branch=master)](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert)
 
 [SweetAlert2](https://sweetalert2.github.io/) integration with Fable, made with :heart: to work with [Elmish](https://github.com/fable-elmish/elmish) commands. 
 
