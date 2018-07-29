@@ -1,0 +1,15 @@
+group Main
+    source https://api.nuget.org/v3/index.json
+    storage:none
+    
+    clitool dotnet-fable
+    nuget FSharp.Core
+    nuget Fable.Core
+    nuget Fable.Elmish
+    nuget Fable.Elmish.React
+    nuget Fable.Elmish.Browser
+
+group Build
+  source https://api.nuget.org/v3/index.json
+
+  nuget FAKE
