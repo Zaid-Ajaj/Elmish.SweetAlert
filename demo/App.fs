@@ -17,6 +17,7 @@ type Model =
     | ConfirmAlertDocs
     | InputAlertDocs
     | SelectAlertDocs
+    | ConfirmToastAlertDocs
     | Other
 
 let init() = SimpleAlertDocs, Cmd.none
@@ -27,6 +28,7 @@ type AppMsg =
     | SwitchToConfirmAlertDocs 
     | SwitchToInputAlertDocs
     | SwitchToSelectAlertDocs
+    | SwitchToConfirmToastAlertDocs
     | SimplestAlert
     | SimpleAlertWithTitle
     | SuccessAlert
@@ -37,6 +39,7 @@ type AppMsg =
     | ToastTopConfirm
     | CustomConfirmBtnText
     | ConfirmAlertMsg
+    | ConfirmToastAlertMsg
     | ConfirmResultMsg of Result<string, string> 
     | InputAlertMsg 
     | InputResultMsg of Result<string, string> 
@@ -59,6 +62,9 @@ let update msg state  =
 
     | SwitchToSelectAlertDocs -> 
         SelectAlertDocs, Cmd.none
+
+    | SwitchToConfirmToastAlertDocs ->
+        ConfirmToastAlertDocs, Cmd.none
     
     | SimplestAlert -> 
         let alert = SimpleAlert("Simple but sweet")
@@ -148,6 +154,20 @@ let update msg state  =
 
         let confirmAlert = 
             ConfirmAlert("You won't be able to undo this action", handleConfirm)
+                .Title("Are you sure you want to delete the file?")
+                .ShowCloseButton(true)
+                .Timeout(10000)
+                .Type(AlertType.Question)
+        
+        state, SweetAlert.Run(confirmAlert)
+    
+    | ConfirmToastAlertMsg -> 
+        let handleConfirm = function 
+        | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg (Ok "You confirmed")
+        | ConfirmAlertResult.Dismissed reason -> AppMsg.ConfirmResultMsg (Error "Dismissed") 
+
+        let confirmAlert = 
+            ConfirmToastAlert("You won't be able to undo this action", handleConfirm)
                 .Title("Are you sure you want to delete the file?")
                 .ShowCloseButton(true)
                 .Timeout(10000)
@@ -408,6 +428,21 @@ let inputAlertMsg = """
     state, SweetAlert.Run(errorAlert)
 """ 
 
+let confirmToastAlert = """
+| ConfirmToastAlertMsg -> 
+    let handleConfirm = function 
+    | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg (Ok "You confirmed")
+    | ConfirmAlertResult.Dismissed reason -> AppMsg.ConfirmResultMsg (Error "Dismissed") 
+
+    let confirmAlert = 
+        ConfirmToastAlert("You won't be able to undo this action", handleConfirm)
+            .Title("Are you sure you want to delete the file?")
+            .ShowCloseButton(true)
+            .Timeout(10000)
+            .Type(AlertType.Question)
+    
+    state, SweetAlert.Run(confirmAlert)
+"""
 let simpleToastAlert = """
 | SimpleToastAlert ->
     let toastAlert = 
@@ -644,6 +679,24 @@ let renderSelectAlert dispatch =
             ]
         ]
 
+let renderConfirmToastAlert dispatch = 
+        div [ Style [ Padding 20 ] ] [ 
+            h3 [ ] [ str "ConfirmToastAlert API" ] 
+            p [ ] [ str "Combines ConfirmAlert with ToastAlert functionality"] 
+            br [ ] 
+            div [ ClassName "row"; ] [
+                div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
+                    div [ ClassName "btn btn-info"; 
+                          OnClick (fun _ -> dispatch ConfirmToastAlertMsg ) ]
+                        [ str "dispatch ConfirmToastAlertMsg" ] 
+                ]
+
+                div [ ClassName "col-md-9" ] [ 
+                    code [ ] [ pre [ ] [ str confirmToastAlert ] ]
+                ]
+            ]
+        ]    
+        
 let render state dispatch = 
     let currentDocs = 
       match state with 
@@ -652,6 +705,7 @@ let render state dispatch =
       | ConfirmAlertDocs -> renderConfirmAlert dispatch 
       | InputAlertDocs -> renderInputAlert dispatch
       | SelectAlertDocs -> renderSelectAlert dispatch 
+      | ConfirmToastAlertDocs -> renderConfirmToastAlert dispatch
       | _ -> h1 [ ] [ str "Unknown API" ]
     
     div [ Style [ Padding 20 ] ] [ 
@@ -679,6 +733,10 @@ let render state dispatch =
                   OnClick (fun _ -> dispatch SwitchToConfirmAlertDocs)
                   Style [ Height 70; Padding 20; Margin 10 ]  ] 
                 [ str "ConfirmAlert" ]
+            div [ ClassName (if state = ConfirmToastAlertDocs then "btn btn-success" else "btn btn-secondary")
+                  OnClick (fun _ -> dispatch SwitchToConfirmToastAlertDocs)
+                  Style [ Height 70; Padding 20; Margin 10 ]  ] 
+                [ str "ConfirmToastAlert" ]
             div [ ClassName (if state = InputAlertDocs then "btn btn-success" else "btn btn-secondary")
                   OnClick (fun _ -> dispatch SwitchToInputAlertDocs)
                   Style [ Height 70; Padding 20; Margin 10 ]  ] 
