@@ -9,23 +9,22 @@
     "url": "https://github.com/Zaid-Ajaj/Elmish.SweetAlert.git"
   },
   "dependencies": {
-    "babel-runtime": "6.23.0",
+    "@babel/core": "^7.0.1"
+  },
+  "devDependencies": {
     "gh-pages": "^1.1.0",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "remotedev": "^0.2.7",
     "sweetalert2": "^7.26.2",
-    "toastr": "^2.1.2"
-  },
-  "devDependencies": {
-    "babel-core": "6.25.0",
-    "babel-loader": "7.1.1",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "fable-loader": "1.1.6",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "fable-loader": "^2.0.0-alpha-003",
     "fable-utils": "^1.0.6",
     "loglevel": "^1.6.0",
-    "webpack": "3.10.0",
-    "webpack-dev-server": "^2.9.7"
+    "webpack": "^4.8.1",
+    "webpack-cli": "^3.0.1",
+    "webpack-dev-server": "^3.1.4"
   }
 }

@@ -2,14 +2,15 @@ group Main
     source https://api.nuget.org/v3/index.json
     storage:none
     
-    clitool dotnet-fable
     nuget FSharp.Core
-    nuget Fable.Core
-    nuget Fable.Elmish
-    nuget Fable.Elmish.React
-    nuget Fable.Elmish.Browser
+    nuget Fable.Core prerelease
+    nuget Fable.Elmish prerelease
+    nuget Fable.Elmish.React prerelease
+    nuget Fable.Elmish.Browser prerelease
+    clitool dotnet-fable prerelease
 
 group Build
+  framework >= net45
   source https://api.nuget.org/v3/index.json
 
-  nuget FAKE
+  nuget FAKE ~> 4.64.6

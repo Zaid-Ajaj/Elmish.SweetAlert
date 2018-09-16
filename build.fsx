@@ -12,10 +12,6 @@ let platformTool tool winTool =
   tool
   |> ProcessHelper.tryFindFileOnPath
   |> function Some t -> t | _ -> failwithf "%s not found" tool
-
-let nodeTool = platformTool "node" "node.exe"
-let npmTool = platformTool "npm" "npm.cmd"
-
 let dotnetCli = "dotnet"
 
 let run fileName args workingDir =
