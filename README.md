@@ -1,15 +1,8 @@
-# Elmish.SweetAlert [![Build Status](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert.svg?branch=master)](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert)
+# Elmish.SweetAlert [![Build Status](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert.svg?branch=master)](https://travis-ci.org/Zaid-Ajaj/Elmish.SweetAlert)  [![Nuget](https://img.shields.io/nuget/v/Elmish.SweetAlert.svg?maxAge=0&colorB=brightgreen)](https://www.nuget.org/packages/Elmish.SweetAlert)
 
 [SweetAlert2](https://sweetalert2.github.io/) integration with Fable, made with :heart: to work with [Elmish](https://github.com/fable-elmish/elmish) commands. 
 
-[Live Docs Application](https://zaid-ajaj.github.io/Elmish.SweetAlert/)
-
-### Nuget Packages
-
-| Fable version | Package |
-| ------------- | ------------- |
-| 1.3.x  |  [![Nuget](https://img.shields.io/nuget/v/Elmish.SweetAlert.svg?maxAge=0&colorB=brightgreen)](https://www.nuget.org/packages/Elmish.SweetAlert)  |
-| 2.0-beta  | [![Nuget](https://img.shields.io/nuget/vpre/Elmish.SweetAlert.svg?maxAge=0&colorB=brightgreen)](https://www.nuget.org/packages/Elmish.SweetAlert)   |
+[Live Demo Application with Examples](https://zaid-ajaj.github.io/Elmish.SweetAlert/)
 
 ## Installation
 - Install this library from nuget
