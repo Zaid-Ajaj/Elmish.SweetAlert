@@ -1,15 +1,11 @@
 module App
 
+open System
 open Elmish
 open Elmish.React
 open Elmish.SweetAlert
-
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-open Fable.Core
-open Elmish.SweetAlert
-open System 
-open Elmish.SweetAlert
+open Fable.React
+open Fable.React.Props
 
 type Model = 
     | SimpleAlertDocs 
@@ -752,6 +748,6 @@ let render state dispatch =
     ] 
 
 Program.mkProgram init update render 
-|> Program.withReact "root"
+|> Program.withReactSynchronous "root"
 |> Program.withConsoleTrace
 |> Program.run

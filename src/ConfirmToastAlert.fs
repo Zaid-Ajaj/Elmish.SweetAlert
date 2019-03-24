@@ -1,7 +1,6 @@
 namespace Elmish.SweetAlert 
 
-open Fable.Import.JS
-open Fable.PowerPack 
+open Fable.Core
 
 /// Combines functionality from ConfirmAlert and ToastAlert
 type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) = 
@@ -99,20 +98,21 @@ type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
 
     interface ISweetAlert<'a> with 
         member this.Run(dispatch) = 
-            promise {
-                let! result = unbox<Promise<obj>> (Interop.swal config) 
+            async {
+                let! result = Async.AwaitPromise (unbox (Interop.fire config)) 
                 let value = Interop.getAs<bool> result "value"  
-                if value then return ConfirmAlertResult.Confirmed
+                let handle confirmResult = dispatch (handler confirmResult)
+                if value then handle ConfirmAlertResult.Confirmed
                 else 
                     let dismiss = Interop.getAs<obj> result "dismiss" 
                     if dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "cancel" 
-                    then return ConfirmAlertResult.Dismissed (DismissalReason.Cancel) 
+                    then handle (ConfirmAlertResult.Dismissed DismissalReason.Cancel)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "esc" 
-                    then return ConfirmAlertResult.Dismissed DismissalReason.PressedEscape 
+                    then handle (ConfirmAlertResult.Dismissed DismissalReason.PressedEscape)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "close" 
-                    then return ConfirmAlertResult.Dismissed DismissalReason.Close
+                    then handle (ConfirmAlertResult.Dismissed DismissalReason.Close)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "backdrop" 
-                    then return ConfirmAlertResult.Dismissed DismissalReason.ClickedOutsideDialog
-                    else return ConfirmAlertResult.Dismissed DismissalReason.TimedOut
+                    then handle (ConfirmAlertResult.Dismissed DismissalReason.ClickedOutsideDialog)
+                    else handle (ConfirmAlertResult.Dismissed DismissalReason.TimedOut)
 
-            } |> Fable.PowerPack.Promise.iter (fun confirmResult -> dispatch (handler confirmResult))
+            } |> Async.StartImmediate

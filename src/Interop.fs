@@ -1,9 +1,8 @@
 namespace Elmish.SweetAlert 
 
-open Elmish
 open Fable.Core
 open Fable.Core.JsInterop
-open Fable.Import.JS
+open Fable.Core.JS
 
 [<RequireQualifiedAccess>]
 module internal Interop = 
@@ -38,4 +37,4 @@ module internal Interop =
         | InputAlertType.TextArea -> "textarea"
 
     let swal : obj -> Promise<obj> = importDefault "sweetalert2"
-
+    let fire : obj -> Promise<obj> = getAs swal "fire"

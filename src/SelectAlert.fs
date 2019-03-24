@@ -1,15 +1,16 @@
 namespace Elmish.SweetAlert 
 
-open Fable.PowerPack
+
+open Fable.Core
 
 /// SelectAlert lets create modals where the user can select from a dropdown.
-type SelectAlert<'a>(options: Map<string, string>, handler: SelectAlertResult -> 'a) = 
+type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: SelectAlertResult -> 'a) = 
     let config = obj() 
     do 
         Interop.setProp "input" "select" config
         Interop.setProp "showCancelButton" true config 
         let inputOptions = obj()
-        Map.iter (fun key value -> Interop.setProp key value inputOptions) options
+        options |> Map.iter (fun key value -> Interop.setProp key value inputOptions) 
         Interop.setProp "inputOptions" inputOptions config 
  
     /// Sets the input type for the alert
@@ -22,10 +23,11 @@ type SelectAlert<'a>(options: Map<string, string>, handler: SelectAlertResult ->
         let innerValidator = 
             fun (key:string) -> 
                 let value = Map.find key options 
-                Promise.create <| fun res rej -> 
+                Fable.Core.JS.Promise.Create(fun res rej -> 
                     match validate (key, value) with  
                     | Ok _ -> (res (unbox<string> ())) 
                     | Error errorMsg -> res(errorMsg) 
+                )
 
         Interop.setProp "inputValidator" innerValidator config 
         this 
@@ -145,28 +147,28 @@ type SelectAlert<'a>(options: Map<string, string>, handler: SelectAlertResult ->
     member this.ImageAlt(alt: string) = 
         Interop.setProp "imageAlt" alt config 
         this 
-
     
     interface ISweetAlert<'a> with 
         member this.Run(dispatch) = 
-            promise {
-                let! result = unbox<Fable.Import.JS.Promise<obj>> (Interop.swal config) 
-                let keys = (Fable.Import.JS.Object.keys result).ToArray() 
+            async { 
+                let! result = Async.AwaitPromise (unbox (Interop.fire config)) 
+                let keys = (Fable.Core.JS.Object.keys result).ToArray() 
+                let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)  
                 then 
                     let key = Interop.getAs<string> result "value"
                     let value = Map.find key options 
-                    return SelectAlertResult.Confirmed (key, value)   
+                    return handle (SelectAlertResult.Confirmed (key, value))
                 else 
                     let dismiss = Interop.getAs<obj> result "dismiss" 
                     if dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "cancel" 
-                    then return SelectAlertResult.Dismissed (DismissalReason.Cancel) 
+                    then handle (SelectAlertResult.Dismissed DismissalReason.Cancel)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "esc" 
-                    then return SelectAlertResult.Dismissed DismissalReason.PressedEscape 
+                    then handle (SelectAlertResult.Dismissed DismissalReason.PressedEscape)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "close" 
-                    then return SelectAlertResult.Dismissed DismissalReason.Close
+                    then handle (SelectAlertResult.Dismissed DismissalReason.Close)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "backdrop" 
-                    then return SelectAlertResult.Dismissed DismissalReason.ClickedOutsideDialog
-                    else return SelectAlertResult.Dismissed DismissalReason.TimedOut
+                    then handle (SelectAlertResult.Dismissed DismissalReason.ClickedOutsideDialog)
+                    else handle (SelectAlertResult.Dismissed DismissalReason.TimedOut)
 
-            } |> Fable.PowerPack.Promise.iter (fun confirmResult -> dispatch (handler confirmResult))
+            } |> Async.StartImmediate

@@ -3,11 +3,8 @@ group Main
     storage:none
     
     nuget FSharp.Core
-    nuget Fable.Core 
-    nuget Fable.Elmish 
-    nuget Fable.Elmish.React 
-    nuget Fable.Elmish.Browser 
-    clitool dotnet-fable
+    nuget Fable.Core ~> 3.0.0-beta-005
+    nuget Fable.Elmish.React ~> 3.0.0-beta-4
 
 group Build
   framework >= net45

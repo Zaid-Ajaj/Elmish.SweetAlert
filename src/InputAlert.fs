@@ -1,6 +1,6 @@
 namespace Elmish.SweetAlert 
 
-open Fable.PowerPack
+open Fable.Core
 
 /// InputAlert lets you create modals with textual input, along with validation of confirmation of the input.
 type InputAlert<'a>(handler: InputAlertResult -> 'a) = 
@@ -23,7 +23,7 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
     member this.Validate(validate: string -> Result<string, string>) = 
         let innerValidator = 
             fun (value:string) -> 
-                Promise.create <| fun res rej -> 
+                Fable.Core.JS.Promise.Create <| fun res rej -> 
                     match validate value with  
                     | Ok _ -> (res (unbox<string> ())) 
                     | Error errorMsg -> res(errorMsg) 
@@ -144,21 +144,22 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
     
     interface ISweetAlert<'a> with 
         member this.Run(dispatch) = 
-            promise {
-                let! result = unbox<Fable.Import.JS.Promise<obj>> (Interop.swal config) 
-                let keys = (Fable.Import.JS.Object.keys result).ToArray() 
+            async {
+                let! result = Async.AwaitPromise (unbox (Interop.fire config)) 
+                let keys = (Fable.Core.JS.Object.keys result).ToArray()
+                let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)  
-                then return InputAlertResult.Confirmed (Interop.getAs<string> result "value")   
+                then handle (InputAlertResult.Confirmed (Interop.getAs<string> result "value"))   
                 else 
                     let dismiss = Interop.getAs<obj> result "dismiss" 
                     if dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "cancel" 
-                    then return InputAlertResult.Dismissed (DismissalReason.Cancel) 
+                    then handle (InputAlertResult.Dismissed DismissalReason.Cancel)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "esc" 
-                    then return InputAlertResult.Dismissed DismissalReason.PressedEscape 
+                    then handle (InputAlertResult.Dismissed DismissalReason.PressedEscape)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "close" 
-                    then return InputAlertResult.Dismissed DismissalReason.Close
+                    then handle (InputAlertResult.Dismissed DismissalReason.Close)
                     elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "backdrop" 
-                    then return InputAlertResult.Dismissed DismissalReason.ClickedOutsideDialog
-                    else return InputAlertResult.Dismissed DismissalReason.TimedOut
+                    then handle (InputAlertResult.Dismissed DismissalReason.ClickedOutsideDialog)
+                    else handle (InputAlertResult.Dismissed DismissalReason.TimedOut)
 
-            } |> Fable.PowerPack.Promise.iter (fun confirmResult -> dispatch (handler confirmResult))
+            } |> Async.StartImmediate

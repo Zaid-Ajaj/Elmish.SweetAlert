@@ -1,14 +1,5 @@
 var path = require("path");
 
-var babelOptions = {
-  presets: [
-    ["env", {
-        "modules": false,
-        "useBuiltIns": "usage",
-    }]
-  ]
-};
-
 module.exports = function (evn, argv) {
   var mode = argv.mode || "development";
   var isProduction = mode === "production";
@@ -31,14 +22,6 @@ module.exports = function (evn, argv) {
        {
          test: /\.fs(x|proj)?$/,
          use: "fable-loader"
-       },
-       {
-         test: /\.js$/,
-         exclude: /node_modules/,
-         use: {
-           loader: 'babel-loader',
-           options: babelOptions
-         },
        }
      ]
    }

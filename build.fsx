@@ -57,11 +57,8 @@ Target "InstallNpmPackages" (fun _ ->
   run "npm" "install" __SOURCE_DIRECTORY__
 )
 
-Target "RestoreFableTestProject" <| fun _ ->
-  run dotnetCli "restore" testsPath
-
 Target "RunLiveApp" <| fun _ ->
-    run dotnetCli "fable npm-run start" testsPath
+    run "npm" "start" "."
 
 let publish projectPath = fun () ->
     [ projectPath </> "bin"
@@ -83,19 +80,17 @@ let publish projectPath = fun () ->
 Target "PublishNuget" (publish libPath)
 
 Target "CompileFableTestProject" <| fun _ ->
-    run dotnetCli "fable npm-run build --port free" testsPath
+    run "npm" "run build" "."
 
 Target "Build" DoNothing
 
 
 "Clean"
   ==> "InstallNpmPackages"
-  ==> "RestoreFableTestProject"
   ==> "RunLiveApp"
 
 "Clean"
   ==> "InstallNpmPackages"
-  ==> "RestoreFableTestProject"
   ==> "CompileFableTestProject"
   ==> "Build"
 

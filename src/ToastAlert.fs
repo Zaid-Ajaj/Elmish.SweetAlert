@@ -50,4 +50,4 @@ type ToastAlert<'a>(text: string) =
 
     interface ISweetAlert<'a> with 
         member this.Run(dispatch) : unit = 
-            Interop.swal config |> ignore 
+            Interop.fire config |> ignore 

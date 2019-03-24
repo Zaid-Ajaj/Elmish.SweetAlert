@@ -1,6 +1,6 @@
 namespace Elmish.SweetAlert 
 
-open Fable.Import.JS
+open Fable.Core.JS
 
 /// SimpleAlert lets you create highly customizable SweetAlert modals that show information. 
 type SimpleAlert<'a>(text: string) = 
@@ -84,7 +84,4 @@ type SimpleAlert<'a>(text: string) =
 
     interface ISweetAlert<'a> with 
         member this.Run (dispatch) = 
-            let keys = (Object.keys config).ToArray() 
-            match keys with 
-            | [| "text" |] -> Interop.swal text |> ignore
-            | _ -> Interop.swal config |> ignore 
+            Interop.fire config |> ignore 
