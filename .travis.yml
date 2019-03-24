@@ -20,4 +20,5 @@ before_install:
   - sudo apt-get update && sudo apt-get install yarn
 
 script:
+  - npm install
   - npm run build
