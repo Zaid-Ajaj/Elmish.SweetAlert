@@ -7,13 +7,13 @@
     <PackageIconUrl></PackageIconUrl>
     <PackageTags>fsharp;fable;elmish;sweetalert;modals</PackageTags>
     <Authors>Zaid Ajaj</Authors>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <NpmDependencies>
-        <NpmPackage Name="sweetalert2" Version=">= 8.5" />
+      <NpmPackage Name="sweetalert2" Version=">= 8.17.1" />
     </NpmDependencies>
   </PropertyGroup>
   <ItemGroup>

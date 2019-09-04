@@ -15,7 +15,7 @@ node_modules/
 *.userprefs
 *.dll.mdb
 *.exe.mdb
-
+.ionide
 # Build results
 
 [Dd]ebug/
