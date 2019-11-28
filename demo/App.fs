@@ -34,6 +34,7 @@ type AppMsg =
     | SimpleToastAlert
     | ToastTopConfirm
     | CustomConfirmBtnText
+    | ScrollbarPaddingFalse
     | ConfirmAlertMsg
     | ConfirmToastAlertMsg
     | ConfirmResultMsg of Result<string, string>
@@ -125,6 +126,13 @@ let update msg state  =
                 .Title("Heads up!")
                 .Type(AlertType.Warning)
                 .ConfirmButtonText("Oki doki!")
+
+        state, SweetAlert.Run(alert)
+
+    | ScrollbarPaddingFalse ->
+        let alert =
+            SimpleAlert("A simple alert without padding")
+                .ScrollbarPadding(false)
 
         state, SweetAlert.Run(alert)
 
@@ -374,6 +382,16 @@ let customConfirmBtnText = """
 
     state, SweetAlert.Run(alert)
 """
+
+let scrollbarPaddingFalseText = """
+| ScrollbarPaddingFalse ->
+    let alert =
+        SimpleAlert("A simple alert without padding")
+            .ScrollbarPadding(false)
+
+    state, SweetAlert.Run(alert)
+"""
+
 let withImage = """
 | WithImage ->
     let alert =
@@ -584,6 +602,21 @@ let renderSimpleAlert dispatch =
                 code [ ] [ pre [ ] [ str customConfirmBtnText ] ]
             ]
         ]
+
+        hr [ ]
+
+        div [ ClassName "row"; ] [
+            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
+                div [ ClassName "btn btn-info";
+                      OnClick (fun _ -> dispatch ScrollbarPaddingFalse) ]
+                    [ str "dispatch ScrollbarPaddingFalse" ]
+            ]
+
+            div [ ClassName "col-md-9" ] [
+                code [ ] [ pre [ ] [ str scrollbarPaddingFalseText ] ]
+            ]
+        ]
+
     ]
 
 let renderToastAlert dispatch =
