@@ -1,6 +1,7 @@
 namespace Elmish.SweetAlert
 
 open Fable.Core
+open Fable.Core.JsInterop
 
 /// InputAlert lets you create modals with textual input, along with validation of confirmation of the input.
 type InputAlert<'a>(handler: InputAlertResult -> 'a) =
@@ -23,7 +24,7 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
     member this.Validate(validate: string -> Result<string, string>) =
         let innerValidator =
             fun (value:string) ->
-                Fable.Core.JS.Promise.Create <| fun res rej ->
+                JS.Constructors.Promise.Create <| fun res rej ->
                     match validate value with
                     | Ok _ -> (res (unbox<string> ()))
                     | Error errorMsg -> res(errorMsg)
@@ -46,10 +47,15 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
         Interop.setProp "title" title config
         this
 
-    /// Specify the dialog alert type.
-    member this.Type(alertType: AlertType) =
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
-        this
+    /// Specify the dialog alert icon.
+    member this.Icon(alertType: AlertIcon) = 
+        Interop.setProp "icon" (Interop.stringifyAlertIcon alertType) config
+        this 
+
+    /// Set the icon via a html string.
+    member this.IconHtml(htmlString: string) = 
+        Interop.setProp "iconHtml" htmlString config
+        this 
 
     /// Shows a close button on the dialog
     member this.ShowCloseButton(enable: bool) =
@@ -64,11 +70,6 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
     /// Sets the text for the (OK) confirm button
     member this.ConfirmButtonText(buttonText: string) =
         Interop.setProp "confirmButtonText" buttonText config
-        this
-
-    /// Sets a custom class for the confirmation button, property `ButtonStyling` must be set to false.
-    member this.ConfirmButtonClass(className: string) =
-        Interop.setProp "confirmButtonClass" className config
         this
 
     /// Disables the default styling for the confirm buttons so you can customize it using the `ConfirmButtonClass` property
@@ -116,9 +117,29 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
         Interop.setProp "customClass" className config
         this
 
-    /// Sets whether the dialog uses animation or not, it is set to true by default.
-    member this.UseAnimation(enable: bool) =
-        Interop.setProp "animation" enable config
+    /// Applies CSS class names to their given field based on the updated customClass object.
+    member this.CustomClass(overrides: customClass -> unit) =
+        Interop.setProp "customClass" (jsOptions<customClass>overrides) config
+        this
+
+    /// Disable animations
+    member this.DisableAnimation(value: bool) =
+        if value then 
+            Interop.setProp "showClass" 
+                (jsOptions<showClass>(fun o -> 
+                    o.popup <- ""
+                    o.backdrop <- ""
+                    o.icon <- "")) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.ShowClass(overrides: showClass -> unit) =
+        Interop.setProp "showClass" (jsOptions<showClass>overrides) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.HideClass(overrides: hideClass -> unit) =
+        Interop.setProp "hideClass" (jsOptions<hideClass>overrides) config
         this
 
     /// Adds an image to the dialog from the given image url
@@ -150,7 +171,7 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
         member this.Run(dispatch) =
             async {
                 let! result = Async.AwaitPromise (unbox (Interop.fire config))
-                let keys = (Fable.Core.JS.Object.keys result).ToArray()
+                let keys = (JS.Constructors.Object.keys result).ToArray()
                 let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)
                 then handle (InputAlertResult.Confirmed (Interop.getAs<string> result "value"))

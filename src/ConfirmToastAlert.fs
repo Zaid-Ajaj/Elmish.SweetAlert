@@ -1,6 +1,7 @@
 namespace Elmish.SweetAlert 
 
 open Fable.Core
+open Fable.Core.JsInterop
 
 /// Combines functionality from ConfirmAlert and ToastAlert
 type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) = 
@@ -16,9 +17,14 @@ type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
         Interop.setProp "title" title config
         this 
 
-    /// Specify the dialog alert type.
-    member this.Type(alertType: AlertType) = 
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
+    /// Specify the dialog alert icon.
+    member this.Icon(alertType: AlertIcon) = 
+        Interop.setProp "icon" (Interop.stringifyAlertIcon alertType) config
+        this 
+
+    /// Set the icon via a html string.
+    member this.IconHtml(htmlString: string) = 
+        Interop.setProp "iconHtml" htmlString config
         this 
 
     /// Shows a close button on the dialog
@@ -56,11 +62,6 @@ type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
         Interop.setProp "cancelButtonColor" color config 
         this 
 
-    /// Sets a custom class for the cancel button, the property `ButtonStyling` must be set to false
-    member this.CancelButtonClass(className: string) = 
-        Interop.setProp "cancelButtonClass" className config 
-        this 
-
     /// Sets the text of the cancel button 
     member this.CancelButtonText(buttonText: string) = 
         Interop.setProp "cancelButtonText" buttonText config
@@ -86,10 +87,30 @@ type ConfirmToastAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
         Interop.setProp "customClass" className config
         this
 
-    /// Sets whether the dialog uses animation or not, it is set to true by default.
-    member this.UseAnimation(enable: bool) = 
-        Interop.setProp "animation" enable config 
-        this 
+    /// Applies CSS class names to their given field based on the updated customClass object.
+    member this.CustomClass(overrides: customClass -> unit) =
+        Interop.setProp "customClass" (jsOptions<customClass>overrides) config
+        this
+
+    /// Disable animations
+    member this.DisableAnimation(value: bool) =
+        if value then 
+            Interop.setProp "showClass" 
+                (jsOptions<showClass>(fun o -> 
+                    o.popup <- ""
+                    o.backdrop <- ""
+                    o.icon <- "")) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.ShowClass(overrides: showClass -> unit) =
+        Interop.setProp "showClass" (jsOptions<showClass>overrides) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.HideClass(overrides: hideClass -> unit) =
+        Interop.setProp "hideClass" (jsOptions<hideClass>overrides) config
+        this
 
     /// If set to true, the cancel button becomes focussed when the modal appears. This is set to false by default
     member this.FocusCancel(enable: bool) = 

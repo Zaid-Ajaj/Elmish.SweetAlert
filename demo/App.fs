@@ -75,7 +75,7 @@ let update msg state  =
         let successAlert =
             SimpleAlert("Your account has been succesfully created!")
                 .Title("Server")
-                .Type(AlertType.Success)
+                .Icon(AlertIcon.Success)
 
         state, SweetAlert.Run(successAlert)
 
@@ -83,7 +83,7 @@ let update msg state  =
         let errorAlert =
             SimpleAlert("That didn't go as we expected")
                 .Title("We are sorry...")
-                .Type(AlertType.Error)
+                .Icon(AlertIcon.Error)
                 .Timeout(3000)
 
         state, SweetAlert.Run(errorAlert)
@@ -92,7 +92,7 @@ let update msg state  =
         let successAlert =
             SimpleAlert("You have levelled up!")
                 .Title("Congrats")
-                .Type(AlertType.Success)
+                .Icon(AlertIcon.Success)
                 .ConfirmButton(false)
                 .Timeout(2000)
 
@@ -105,7 +105,7 @@ let update msg state  =
                 .ImageUrl("https://unsplash.it/400/200")
                 .ImageHeight(200)
                 .ImageWidth(400)
-                .UseAnimation(false)
+                .DisableAnimation(true)
 
         state, SweetAlert.Run(alert)
 
@@ -116,7 +116,7 @@ let update msg state  =
                 .Timeout(3000)
                 .ConfirmButton(false)
                 .Position(AlertPosition.TopEnd)
-                .Type(AlertType.Info)
+                .Icon(AlertIcon.Info)
 
         state, SweetAlert.Run(toastAlert)
 
@@ -124,7 +124,7 @@ let update msg state  =
         let alert =
             SimpleAlert("We are going to launch the missiles")
                 .Title("Heads up!")
-                .Type(AlertType.Warning)
+                .Icon(AlertIcon.Warning)
                 .ConfirmButtonText("Oki doki!")
 
         state, SweetAlert.Run(alert)
@@ -140,7 +140,7 @@ let update msg state  =
         let toastAlert =
             ToastAlert("Things are going good!")
                 .Position(AlertPosition.Top)
-                .Type(AlertType.Success)
+                .Icon(AlertIcon.Success)
                 .Timeout(2000)
 
         state, SweetAlert.Run(toastAlert)
@@ -161,7 +161,7 @@ let update msg state  =
                 .Title("Are you sure you want to delete the file?")
                 .ShowCloseButton(true)
                 .Timeout(10000)
-                .Type(AlertType.Question)
+                .Icon(AlertIcon.Question)
 
         state, SweetAlert.Run(confirmAlert)
 
@@ -175,7 +175,7 @@ let update msg state  =
                 .Title("Are you sure you want to delete the file?")
                 .ShowCloseButton(true)
                 .Timeout(10000)
-                .Type(AlertType.Question)
+                .Icon(AlertIcon.Question)
 
         state, SweetAlert.Run(confirmAlert)
 
@@ -183,7 +183,7 @@ let update msg state  =
         let successAlert =
             SimpleAlert("You imaginary file was succesfully deleted")
                 .Title("Success")
-                .Type(AlertType.Success)
+                .Icon(AlertIcon.Success)
 
         state, SweetAlert.Run(successAlert)
 
@@ -191,7 +191,7 @@ let update msg state  =
         let errorAlert =
             SimpleAlert("Your imaginary file was left alone, reason: " + errorMsg)
                 .Title("We didn't delete anything")
-                .Type(AlertType.Info)
+                .Icon(AlertIcon.Info)
 
         state, SweetAlert.Run(errorAlert)
 
@@ -217,16 +217,16 @@ let update msg state  =
                 .Title("Credentials")
                 .Placeholder("Name")
                 .Validate(validate)
-                .Type(AlertType.Question)
+                .Icon(AlertIcon.Question)
 
         state, SweetAlert.Run(inputAlert)
 
     | InputResultMsg (Ok msg) ->
-        let successAlert = SimpleAlert("Your name: " + msg).Type(AlertType.Success)
+        let successAlert = SimpleAlert("Your name: " + msg).Icon(AlertIcon.Success)
         state, SweetAlert.Run(successAlert)
 
     | InputResultMsg (Error msg) ->
-        let errorAlert = SimpleAlert("Error: " + msg).Type(AlertType.Error)
+        let errorAlert = SimpleAlert("Error: " + msg).Icon(AlertIcon.Error)
         state, SweetAlert.Run(errorAlert)
 
     | SelectAlertMsg ->
@@ -248,13 +248,13 @@ let update msg state  =
         let alert =
             SelectAlert(options, handleInput)
                 .Text("What is the best software methodology?")
-                .Type(AlertType.Question)
+                .Icon(AlertIcon.Question)
                 .Validate(validate)
 
         state, SweetAlert.Run(alert)
 
     | SelectAlertConfirmed (key, value) ->
-        let alert = SimpleAlert("Everyone loves " + value).Type(AlertType.Success)
+        let alert = SimpleAlert("Everyone loves " + value).Icon(AlertIcon.Success)
         state, SweetAlert.Run(alert)
 
 let simplestAlert = """
@@ -274,7 +274,7 @@ let successAlert = """
     let successAlert =
         SimpleAlert("Your account has been succesfully created!")
             .Title("Server")
-            .Type(AlertType.Success)
+            .Icon(AlertIcon.Success)
 
     state, SweetAlert.Run(successAlert)
 """
@@ -299,13 +299,13 @@ let selectAlertMsg = """
     let alert =
         SelectAlert(options, handleInput)
             .Text("What is the best software methodology?")
-            .Type(AlertType.Question)
+            .Icon(AlertIcon.Question)
             .Validate(validate)
 
     state, SweetAlert.Run(alert)
 
 | SelectAlertConfirmed (key, value) ->
-    let alert = SimpleAlert("Everyone loves " + value).Type(AlertType.Success)
+    let alert = SimpleAlert("Everyone loves " + value).Icon(AlertIcon.Success)
     state, SweetAlert.Run(alert)
 """
 
@@ -314,7 +314,7 @@ let hideConfirm = """
     let successAlert =
         SimpleAlert("You have levelled up!")
             .Title("Congrats")
-            .Type(AlertType.Success)
+            .Icon(AlertIcon.Success)
             .ConfirmButton(false)
             .Timeout(2000)
 
@@ -326,7 +326,7 @@ let timeout = """
     let errorAlert =
         SimpleAlert("That didn't go as we expected")
             .Title("We are sorry...")
-            .Type(AlertType.Error)
+            .Icon(AlertIcon.Error)
             .Timeout(3000)
 
     state, SweetAlert.Run(errorAlert)
@@ -349,7 +349,7 @@ let confirmAlertMsg = """
     let confirmAlert =
         ConfirmAlert("You won't be able to undo this action", handleConfirm)
             .Title("Are you sure you want to delete the file?")
-            .Type(AlertType.Question)
+            .Icon(AlertIcon.Question)
             .ShowCloseButton(true)
             .Timeout(10000)
 
@@ -359,7 +359,7 @@ let confirmAlertMsg = """
     let successAlert =
         SimpleAlert("You imaginary file was succesfully deleted")
             .Title("Success")
-            .Type(AlertType.Success)
+            .Icon(AlertIcon.Success)
 
     state, SweetAlert.Run(successAlert)
 
@@ -367,7 +367,7 @@ let confirmAlertMsg = """
     let errorAlert =
         SimpleAlert("Your imaginary file was left alone, reason: " + errorMsg)
             .Title("We didn't delete anything")
-            .Type(AlertType.Info)
+            .Icon(AlertIcon.Info)
 
     state, SweetAlert.Run(errorAlert)
 """
@@ -377,7 +377,7 @@ let customConfirmBtnText = """
     let alert =
         SimpleAlert("We are going to launch the missiles")
             .Title("Heads up!")
-            .Type(AlertType.Warning)
+            .Icon(AlertIcon.Warning)
             .ConfirmButtonText("Oki doki!")
 
     state, SweetAlert.Run(alert)
@@ -400,7 +400,7 @@ let withImage = """
             .ImageUrl("https://unsplash.it/400/200")
             .ImageHeight(200)
             .ImageWidth(400)
-            .UseAnimation(false)
+            .DisableAnimation(true)
 
     state, SweetAlert.Run(alert)
 """
@@ -429,16 +429,16 @@ let inputAlertMsg = """
             .Title("Credentials")
             .Placeholder("Name")
             .Validate(validate)
-            .Type(AlertType.Question)
+            .Icon(AlertIcon.Question)
 
     state, SweetAlert.Run(inputAlert)
 
 | InputResultMsg (Ok msg) ->
-    let successAlert = SimpleAlert("Your name: " + msg).Type(AlertType.Success)
+    let successAlert = SimpleAlert("Your name: " + msg).Icon(AlertIcon.Success)
     state, SweetAlert.Run(successAlert)
 
 | InputResultMsg (Error msg) ->
-    let errorAlert = SimpleAlert("Error: " + msg).Type(AlertType.Error)
+    let errorAlert = SimpleAlert("Error: " + msg).Icon(AlertIcon.Error)
     state, SweetAlert.Run(errorAlert)
 """
 
@@ -453,7 +453,7 @@ let confirmToastAlert = """
             .Title("Are you sure you want to delete the file?")
             .ShowCloseButton(true)
             .Timeout(10000)
-            .Type(AlertType.Question)
+            .Icon(AlertIcon.Question)
 
     state, SweetAlert.Run(confirmAlert)
 """
@@ -465,7 +465,7 @@ let simpleToastAlert = """
             .Timeout(3000)
             .ConfirmButton(false)
             .Position(AlertPosition.TopEnd)
-            .Type(AlertType.Info)
+            .Icon(AlertIcon.Info)
 
     state, SweetAlert.Run(toastAlert)
 """
@@ -474,7 +474,7 @@ let toastTopConfirm = """
     let toastAlert =
         ToastAlert("Things are going good!")
             .Position(AlertPosition.Top)
-            .Type(AlertType.Success)
+            .Icon(AlertIcon.Success)
             .Timeout(2000)
 
     state, SweetAlert.Run(toastAlert)

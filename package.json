@@ -16,9 +16,12 @@
     "gh-pages": "^1.1.0",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
-    "sweetalert2": "8.17.1",
+    "sweetalert2": "^9.4.1",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
+  },
+  "dependencies": {
+    "sweetalert2-react-content": "^2.0.2"
   }
 }

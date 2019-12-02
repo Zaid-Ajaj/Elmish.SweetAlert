@@ -6,7 +6,7 @@ open Fable.Core.JS
 
 [<RequireQualifiedAccess>]
 module internal Interop =
-
+        
     [<Emit("$2[$0] = $1")>]
     let setProp (propName: string) (propValue: obj) (any: obj) : unit = jsNative
 
@@ -14,12 +14,12 @@ module internal Interop =
     let getAs<'a> (x: obj) (key: string) : 'a = jsNative
     [<Emit("console.log($0)")>]
     let log (x: 'a) : unit = jsNative
-    let stringifyAlertType = function
-        | AlertType.Info -> "info"
-        | AlertType.Error -> "error"
-        | AlertType.Question -> "question"
-        | AlertType.Warning -> "warning"
-        | AlertType.Success -> "success"
+    let stringifyAlertIcon = function
+        | AlertIcon.Info -> "info"
+        | AlertIcon.Error -> "error"
+        | AlertIcon.Question -> "question"
+        | AlertIcon.Warning -> "warning"
+        | AlertIcon.Success -> "success"
 
     let stringifyPosition = function
         | AlertPosition.Bottom -> "bottom"
@@ -37,5 +37,7 @@ module internal Interop =
         | InputAlertType.Password -> "password"
         | InputAlertType.TextArea -> "textarea"
 
-    let swal : obj -> Promise<obj> = importDefault "sweetalert2"
-    let fire (x: obj) : Promise<obj> = swal?fire(x)
+    let swal : obj = importDefault "sweetalert2"
+    let withReactContent : obj -> obj = importDefault "sweetalert2-react-content"
+    let mySwal = withReactContent(swal)
+    let fire (x: obj) : Promise<obj> = mySwal?fire(x)
