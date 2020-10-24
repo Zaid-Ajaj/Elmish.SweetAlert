@@ -1,60 +1,59 @@
-namespace Elmish.SweetAlert 
+namespace Elmish.SweetAlert
 
-open Elmish 
+open Elmish
 
 [<RequireQualifiedAccess>]
-type AlertType = 
-    | Info 
-    | Question 
-    | Warning 
+type AlertType =
+    | Info
+    | Question
+    | Warning
     | Error
     | Success
 
 [<RequireQualifiedAccess>]
-type AlertPosition = 
-    | Top 
+type AlertPosition =
+    | Top
     | TopStart
-    | TopEnd 
+    | TopEnd
     | Center
     | CenterStart
-    | CenterEnd 
-    | Bottom 
+    | CenterEnd
+    | Bottom
     | BottomStart
-    | BottomEnd 
+    | BottomEnd
 
 [<RequireQualifiedAccess>]
-type DismissalReason = 
-    | Cancel 
-    | PressedEscape 
-    | TimedOut 
-    | Close 
+type DismissalReason =
+    | Cancel
+    | PressedEscape
+    | TimedOut
+    | Close
     | ClickedOutsideDialog
 
 [<RequireQualifiedAccess>]
-type InputAlertType = 
-    | Text 
-    | Password 
-    | TextArea 
+type InputAlertType =
+    | Text
+    | Password
+    | TextArea
 
 [<RequireQualifiedAccess>]
-type ConfirmAlertResult = 
-    | Confirmed 
+type ConfirmAlertResult =
+    | Confirmed
     | Dismissed of reason:DismissalReason
 
 [<RequireQualifiedAccess>]
-type InputAlertResult = 
-    | Confirmed of string 
+type InputAlertResult =
+    | Confirmed of string
     | Dismissed of reason:DismissalReason
 
 [<RequireQualifiedAccess>]
-type SelectAlertResult = 
+type SelectAlertResult =
     | Confirmed of string * string
     | Dismissed of reason:DismissalReason
 
-type ISweetAlert<'a> = 
-    abstract Run : ('a -> unit) -> unit 
+type ISweetAlert<'a> =
+    abstract Run : ('a -> unit) -> unit
 
-type SweetAlert() = 
+type SweetAlert() =
     static member inline Run(alert: ISweetAlert<_>) : Cmd<_> = [alert.Run]
-
-
+    static member inline Run(alert: ISweetAlert<_>, dispatch) = alert.Run(dispatch)
