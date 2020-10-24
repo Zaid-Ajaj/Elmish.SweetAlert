@@ -23,7 +23,7 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
     member this.Validate(validate: string -> Result<string, string>) =
         let innerValidator =
             fun (value:string) ->
-                Fable.Core.JS.Promise.Create <| fun res rej ->
+                Fable.Core.JS.Constructors.Promise.Create <| fun res rej ->
                     match validate value with
                     | Ok _ -> (res (unbox<string> ()))
                     | Error errorMsg -> res(errorMsg)
@@ -150,7 +150,7 @@ type InputAlert<'a>(handler: InputAlertResult -> 'a) =
         member this.Run(dispatch) =
             async {
                 let! result = Async.AwaitPromise (unbox (Interop.fire config))
-                let keys = (Fable.Core.JS.Object.keys result).ToArray()
+                let keys = (Fable.Core.JS.Constructors.Object.keys result).ToArray()
                 let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)
                 then handle (InputAlertResult.Confirmed (Interop.getAs<string> result "value"))

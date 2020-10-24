@@ -23,7 +23,7 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         let innerValidator =
             fun (key:string) ->
                 let value = Map.find key options
-                Fable.Core.JS.Promise.Create(fun res rej ->
+                Fable.Core.JS.Constructors.Promise.Create(fun res rej ->
                     match validate (key, value) with
                     | Ok _ -> (res (unbox<string> ()))
                     | Error errorMsg -> res(errorMsg)
@@ -157,7 +157,7 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         member this.Run(dispatch) =
             async {
                 let! result = Async.AwaitPromise (unbox (Interop.fire config))
-                let keys = (Fable.Core.JS.Object.keys result).ToArray()
+                let keys = (Fable.Core.JS.Constructors.Object.keys result).ToArray()
                 let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)
                 then
