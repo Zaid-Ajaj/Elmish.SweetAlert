@@ -3,7 +3,7 @@ namespace Elmish.SweetAlert
 open Elmish 
 
 [<RequireQualifiedAccess>]
-type AlertType = 
+type AlertIcon = 
     | Info 
     | Question 
     | Warning 
@@ -22,6 +22,21 @@ type AlertPosition =
     | BottomStart
     | BottomEnd 
 
+type customClass =
+    abstract container: string with get, set
+    abstract popup: string with get, set
+    abstract header: string with get, set
+    abstract title: string with get, set
+    abstract closeButton: string with get, set
+    abstract icon: string with get, set
+    abstract image: string with get, set
+    abstract content: string with get, set
+    abstract input: string with get, set
+    abstract actions: string with get, set
+    abstract confirmButton: string with get, set
+    abstract cancelButton: string with get, set
+    abstract footer: string with get, set
+
 [<RequireQualifiedAccess>]
 type DismissalReason = 
     | Cancel 
@@ -29,6 +44,11 @@ type DismissalReason =
     | TimedOut 
     | Close 
     | ClickedOutsideDialog
+
+type hideClass =
+    abstract popup: string with get, set
+    abstract backdrop: string with get, set
+    abstract icon: string with get, set
 
 [<RequireQualifiedAccess>]
 type InputAlertType = 
@@ -50,6 +70,11 @@ type InputAlertResult =
 type SelectAlertResult = 
     | Confirmed of string * string
     | Dismissed of reason:DismissalReason
+
+type showClass =
+    abstract popup: string with get, set
+    abstract backdrop: string with get, set
+    abstract icon: string with get, set
 
 type ISweetAlert<'a> = 
     abstract Run : ('a -> unit) -> unit 

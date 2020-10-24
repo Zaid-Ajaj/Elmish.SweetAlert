@@ -1,7 +1,7 @@
 namespace Elmish.SweetAlert
 
-
 open Fable.Core
+open Fable.Core.JsInterop
 
 /// SelectAlert lets create modals where the user can select from a dropdown.
 type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: SelectAlertResult -> 'a) =
@@ -23,7 +23,7 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         let innerValidator =
             fun (key:string) ->
                 let value = Map.find key options
-                Fable.Core.JS.Promise.Create(fun res rej ->
+                JS.Constructors.Promise.Create(fun res rej ->
                     match validate (key, value) with
                     | Ok _ -> (res (unbox<string> ()))
                     | Error errorMsg -> res(errorMsg)
@@ -31,7 +31,6 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
 
         Interop.setProp "inputValidator" innerValidator config
         this
-
 
     /// Add a placeholder for the input element
     member this.Placeholder(placeholder: string) =
@@ -53,10 +52,15 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         Interop.setProp "title" title config
         this
 
-    /// Specify the dialog alert type.
-    member this.Type(alertType: AlertType) =
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
-        this
+    /// Specify the dialog alert icon.
+    member this.Icon(alertType: AlertIcon) = 
+        Interop.setProp "icon" (Interop.stringifyAlertIcon alertType) config
+        this 
+
+    /// Set the icon via a html string.
+    member this.IconHtml(htmlString: string) = 
+        Interop.setProp "iconHtml" htmlString config
+        this 
 
     /// Shows a close button on the dialog
     member this.ShowCloseButton(enable: bool) =
@@ -73,11 +77,6 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         Interop.setProp "confirmButtonText" buttonText config
         this
 
-    /// Sets a custom class for the confirmation button, property `ButtonStyling` must be set to false.
-    member this.ConfirmButtonClass(className: string) =
-        Interop.setProp "confirmButtonClass" className config
-        this
-
     /// Disables the default styling for the confirm buttons so you can customize it using the `ConfirmButtonClass` property
     member this.ButtonStyling(enable: bool) =
         Interop.setProp "buttonsStyling" enable config
@@ -91,11 +90,6 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
     /// Sets the color for the cancel button
     member this.CancelButtonColor(color: string) =
         Interop.setProp "cancelButtonColor" color config
-        this
-
-    /// Sets a custom class for the cancel button, the property `ButtonStyling` must be set to false
-    member this.CancelButtonClass(className: string) =
-        Interop.setProp "cancelButtonClass" className config
         this
 
     /// Sets the text of the cancel button
@@ -123,9 +117,29 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         Interop.setProp "customClass" className config
         this
 
-    /// Sets whether the dialog uses animation or not, it is set to true by default.
-    member this.UseAnimation(enable: bool) =
-        Interop.setProp "animation" enable config
+    /// Applies CSS class names to their given field based on the updated customClass object.
+    member this.CustomClass(overrides: customClass -> unit) =
+        Interop.setProp "customClass" (jsOptions<customClass>overrides) config
+        this
+
+    /// Disable animations
+    member this.DisableAnimation(value: bool) =
+        if value then 
+            Interop.setProp "showClass" 
+                (jsOptions<showClass>(fun o -> 
+                    o.popup <- ""
+                    o.backdrop <- ""
+                    o.icon <- "")) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.ShowClass(overrides: showClass -> unit) =
+        Interop.setProp "showClass" (jsOptions<showClass>overrides) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.HideClass(overrides: hideClass -> unit) =
+        Interop.setProp "hideClass" (jsOptions<hideClass>overrides) config
         this
 
     /// Adds an image to the dialog from the given image url
@@ -157,7 +171,7 @@ type SelectAlert<'a>(options: FSharp.Collections.Map<string, string>, handler: S
         member this.Run(dispatch) =
             async {
                 let! result = Async.AwaitPromise (unbox (Interop.fire config))
-                let keys = (Fable.Core.JS.Object.keys result).ToArray()
+                let keys = (JS.Constructors.Object.keys result).ToArray()
                 let handle confirmResult = dispatch (handler confirmResult)
                 if not (Array.contains "dismiss" keys)
                 then

@@ -1,6 +1,7 @@
 namespace Elmish.SweetAlert
 
-open Fable.Core.JS
+open Fable.Core
+open Fable.Core.JsInterop
 
 /// SimpleAlert lets you create highly customizable SweetAlert modals that show information.
 type SimpleAlert<'a>(text: string) =
@@ -12,10 +13,15 @@ type SimpleAlert<'a>(text: string) =
         Interop.setProp "title" title config
         this
 
-    /// Specify the dialog alert type.
-    member this.Type(alertType: AlertType) =
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
-        this
+    /// Specify the dialog alert icon.
+    member this.Icon(alertType: AlertIcon) = 
+        Interop.setProp "icon" (Interop.stringifyAlertIcon alertType) config
+        this 
+
+    /// Set the icon via a html string.
+    member this.IconHtml(htmlString: string) = 
+        Interop.setProp "iconHtml" htmlString config
+        this 
 
     /// Sets whether or not the dialog shows the confirm/OK button, it is set to true by default.
     member this.ConfirmButton(enable: bool) =
@@ -25,11 +31,6 @@ type SimpleAlert<'a>(text: string) =
     /// Sets the text for the (OK) confirm button
     member this.ConfirmButtonText(buttonText: string) =
         Interop.setProp "confirmButtonText" buttonText config
-        this
-
-    /// Sets a custom class for the confirmation button, property `ButtonStyling` must be set to false.
-    member this.ConfirmButtonClass(className: string) =
-        Interop.setProp "confirmButtonClass" className config
         this
 
     /// Disables the default styling for the confirm buttons so you can customize it using the `ConfirmButtonClass` property
@@ -57,9 +58,29 @@ type SimpleAlert<'a>(text: string) =
         Interop.setProp "customClass" className config
         this
 
-    /// Sets whether the dialog uses animation or not, it is set to true by default.
-    member this.UseAnimation(enable: bool) =
-        Interop.setProp "animation" enable config
+    /// Applies CSS class names to their given field based on the updated customClass object.
+    member this.CustomClass(overrides: customClass -> unit) =
+        Interop.setProp "customClass" (jsOptions<customClass>overrides) config
+        this
+
+    /// Disable animations
+    member this.DisableAnimation(value: bool) =
+        if value then 
+            Interop.setProp "showClass" 
+                (jsOptions<showClass>(fun o -> 
+                    o.popup <- ""
+                    o.backdrop <- ""
+                    o.icon <- "")) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.ShowClass(overrides: showClass -> unit) =
+        Interop.setProp "showClass" (jsOptions<showClass>overrides) config
+        this
+
+    /// Applies CSS class names to their given field, this is used for animation.
+    member this.HideClass(overrides: hideClass -> unit) =
+        Interop.setProp "hideClass" (jsOptions<hideClass>overrides) config
         this
 
     /// Adds an image to the dialog from the given image url
