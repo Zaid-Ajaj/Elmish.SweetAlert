@@ -19,6 +19,6 @@ paket add Elmish.SweetAlert --project /path/to/Project.fsproj
 ```
 - Install sweetalert2 from npm (version 8.x)
 ```
-npm install sweetalert2 8.19.0 --save
+npm install sweetalert2@8.19.0 --save
 yarn add sweetalert2@8.19.0
 ```
