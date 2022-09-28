@@ -3,7 +3,7 @@ namespace Elmish.SweetAlert
 open Fable.Core
 
 type ConfirmAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
-    let config = obj()
+    let config = obj ()
 
     do
         Interop.setProp "text" text config
@@ -14,9 +14,14 @@ type ConfirmAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
         Interop.setProp "title" title config
         this
 
+    /// Adds HTML to the alert dialog. If text and html parameters are provided in the same time, html will be used.
+    member this.Html(html: string) =
+        Interop.setProp "html" html config
+        this
+
     /// Specify the dialog alert type.
     member this.Type(alertType: AlertType) =
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
+        Interop.setProp "type" (Interop.stringifyAlertType alertType) config
         this
 
     /// Shows a close button on the dialog
@@ -122,21 +127,24 @@ type ConfirmAlert<'a>(text: string, handler: ConfirmAlertResult -> 'a) =
     interface ISweetAlert<'a> with
         member this.Run(dispatch) =
             async {
-                let! result = Async.AwaitPromise (unbox (Interop.fire config))
+                let! result = Async.AwaitPromise(unbox (Interop.fire config))
                 let value = Interop.getAs<bool> result "value"
                 let handle confirmResult = dispatch (handler confirmResult)
-                if value
-                then handle ConfirmAlertResult.Confirmed
+
+                if value then
+                    handle ConfirmAlertResult.Confirmed
                 else
                     let dismiss = Interop.getAs<obj> result "dismiss"
-                    if dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "cancel"
-                    then handle (ConfirmAlertResult.Dismissed (DismissalReason.Cancel))
-                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "esc"
-                    then handle (ConfirmAlertResult.Dismissed DismissalReason.PressedEscape)
-                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "close"
-                    then handle (ConfirmAlertResult.Dismissed DismissalReason.Close)
-                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "backdrop"
-                    then handle (ConfirmAlertResult.Dismissed DismissalReason.ClickedOutsideDialog)
-                    else handle (ConfirmAlertResult.Dismissed DismissalReason.TimedOut)
+
+                    if dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "cancel" then
+                        handle (ConfirmAlertResult.Dismissed(DismissalReason.Cancel))
+                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "esc" then
+                        handle (ConfirmAlertResult.Dismissed DismissalReason.PressedEscape)
+                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "close" then
+                        handle (ConfirmAlertResult.Dismissed DismissalReason.Close)
+                    elif dismiss = Interop.getAs<obj> (Interop.getAs<obj> Interop.swal "DismissReason") "backdrop" then
+                        handle (ConfirmAlertResult.Dismissed DismissalReason.ClickedOutsideDialog)
+                    else
+                        handle (ConfirmAlertResult.Dismissed DismissalReason.TimedOut)
             }
             |> Async.StartImmediate

@@ -4,7 +4,7 @@ open Fable.Core.JS
 
 /// SimpleAlert lets you create highly customizable SweetAlert modals that show information.
 type SimpleAlert<'a>(text: string) =
-    let config = obj()
+    let config = obj ()
     do Interop.setProp "text" text config
 
     /// Adds a title to the alert dialog.
@@ -12,9 +12,14 @@ type SimpleAlert<'a>(text: string) =
         Interop.setProp "title" title config
         this
 
+    /// Adds HTML to the alert dialog. If text and html parameters are provided in the same time, html will be used.
+    member this.Html(html: string) =
+        Interop.setProp "html" html config
+        this
+
     /// Specify the dialog alert type.
     member this.Type(alertType: AlertType) =
-        Interop.setProp "type"  (Interop.stringifyAlertType alertType) config
+        Interop.setProp "type" (Interop.stringifyAlertType alertType) config
         this
 
     /// Sets whether or not the dialog shows the confirm/OK button, it is set to true by default.
@@ -88,5 +93,4 @@ type SimpleAlert<'a>(text: string) =
         this
 
     interface ISweetAlert<'a> with
-        member this.Run (dispatch) =
-            Interop.fire config |> ignore
+        member this.Run(dispatch) = Interop.fire config |> ignore
