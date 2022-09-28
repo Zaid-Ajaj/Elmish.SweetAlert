@@ -16,7 +16,7 @@ type Model =
     | ConfirmToastAlertDocs
     | Other
 
-let init() = SimpleAlertDocs, Cmd.none
+let init () = SimpleAlertDocs, Cmd.none
 
 type AppMsg =
     | SwitchToSimpleAlertDocs
@@ -27,6 +27,7 @@ type AppMsg =
     | SwitchToConfirmToastAlertDocs
     | SimplestAlert
     | SimpleAlertWithTitle
+    | SimpleAlertWithHtml
     | SuccessAlert
     | Timeout
     | HideConfirm
@@ -43,25 +44,19 @@ type AppMsg =
     | SelectAlertMsg
     | SelectAlertConfirmed of (string * string)
 
-let update msg state  =
+let update msg state =
     match msg with
-    | SwitchToSimpleAlertDocs ->
-        SimpleAlertDocs, Cmd.none
+    | SwitchToSimpleAlertDocs -> SimpleAlertDocs, Cmd.none
 
-    | SwitchToToastAlertDocs ->
-        ToastAlertDocs, Cmd.none
+    | SwitchToToastAlertDocs -> ToastAlertDocs, Cmd.none
 
-    | SwitchToConfirmAlertDocs ->
-        ConfirmAlertDocs, Cmd.none
+    | SwitchToConfirmAlertDocs -> ConfirmAlertDocs, Cmd.none
 
-    | SwitchToInputAlertDocs ->
-        InputAlertDocs, Cmd.none
+    | SwitchToInputAlertDocs -> InputAlertDocs, Cmd.none
 
-    | SwitchToSelectAlertDocs ->
-        SelectAlertDocs, Cmd.none
+    | SwitchToSelectAlertDocs -> SelectAlertDocs, Cmd.none
 
-    | SwitchToConfirmToastAlertDocs ->
-        ConfirmToastAlertDocs, Cmd.none
+    | SwitchToConfirmToastAlertDocs -> ConfirmToastAlertDocs, Cmd.none
 
     | SimplestAlert ->
         let alert = SimpleAlert("Simple but sweet")
@@ -69,6 +64,10 @@ let update msg state  =
 
     | SimpleAlertWithTitle ->
         let alert = SimpleAlert("Is that still a thing?").Title("The Internet")
+        state, SweetAlert.Run(alert)
+
+    | SimpleAlertWithHtml ->
+        let alert = SimpleAlert("").Html("<h1 style='color: red'>Simple but sweet</h1>")
         state, SweetAlert.Run(alert)
 
     | SuccessAlert ->
@@ -130,9 +129,7 @@ let update msg state  =
         state, SweetAlert.Run(alert)
 
     | ScrollbarPaddingFalse ->
-        let alert =
-            SimpleAlert("A simple alert without padding")
-                .ScrollbarPadding(false)
+        let alert = SimpleAlert("A simple alert without padding").ScrollbarPadding(false)
 
         state, SweetAlert.Run(alert)
 
@@ -146,15 +143,16 @@ let update msg state  =
         state, SweetAlert.Run(toastAlert)
 
     | ConfirmAlertMsg ->
-        let handleConfirm = function
-        | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg (Ok "You confirmed")
-        | ConfirmAlertResult.Dismissed reason ->
-            match reason with
-            | DismissalReason.Cancel -> AppMsg.ConfirmResultMsg (Error "Clicked cancel")
-            | DismissalReason.Close -> AppMsg.ConfirmResultMsg (Error "Clicked close button")
-            | DismissalReason.PressedEscape -> AppMsg.ConfirmResultMsg (Error "Pressed escape")
-            | DismissalReason.TimedOut -> AppMsg.ConfirmResultMsg (Error "Modal closed after timeout")
-            | DismissalReason.ClickedOutsideDialog ->  AppMsg.ConfirmResultMsg (Error "Clicked outside dialog")
+        let handleConfirm =
+            function
+            | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg(Ok "You confirmed")
+            | ConfirmAlertResult.Dismissed reason ->
+                match reason with
+                | DismissalReason.Cancel -> AppMsg.ConfirmResultMsg(Error "Clicked cancel")
+                | DismissalReason.Close -> AppMsg.ConfirmResultMsg(Error "Clicked close button")
+                | DismissalReason.PressedEscape -> AppMsg.ConfirmResultMsg(Error "Pressed escape")
+                | DismissalReason.TimedOut -> AppMsg.ConfirmResultMsg(Error "Modal closed after timeout")
+                | DismissalReason.ClickedOutsideDialog -> AppMsg.ConfirmResultMsg(Error "Clicked outside dialog")
 
         let confirmAlert =
             ConfirmAlert("You won't be able to undo this action", handleConfirm)
@@ -166,9 +164,10 @@ let update msg state  =
         state, SweetAlert.Run(confirmAlert)
 
     | ConfirmToastAlertMsg ->
-        let handleConfirm = function
-        | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg (Ok "You confirmed")
-        | ConfirmAlertResult.Dismissed reason -> AppMsg.ConfirmResultMsg (Error "Dismissed")
+        let handleConfirm =
+            function
+            | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg(Ok "You confirmed")
+            | ConfirmAlertResult.Dismissed reason -> AppMsg.ConfirmResultMsg(Error "Dismissed")
 
         let confirmAlert =
             ConfirmToastAlert("You won't be able to undo this action", handleConfirm)
@@ -197,19 +196,21 @@ let update msg state  =
 
     | InputAlertMsg ->
         let validate input =
-            if String.IsNullOrEmpty input
-            then Error "Input name cannot be empty"
-            else Ok input
+            if String.IsNullOrEmpty input then
+                Error "Input name cannot be empty"
+            else
+                Ok input
 
-        let handleInput = function
-        | InputAlertResult.Confirmed input -> AppMsg.InputResultMsg (Ok input)
-        | InputAlertResult.Dismissed reason ->
-            match reason with
-            | DismissalReason.Cancel -> AppMsg.InputResultMsg (Error "Clicked cancel")
-            | DismissalReason.Close -> AppMsg.InputResultMsg (Error "Clicked close button")
-            | DismissalReason.PressedEscape -> AppMsg.InputResultMsg (Error "Pressed escape")
-            | DismissalReason.TimedOut -> AppMsg.InputResultMsg (Error "Modal closed after timeout")
-            | DismissalReason.ClickedOutsideDialog ->  AppMsg.InputResultMsg (Error "Clicked outside dialog")
+        let handleInput =
+            function
+            | InputAlertResult.Confirmed input -> AppMsg.InputResultMsg(Ok input)
+            | InputAlertResult.Dismissed reason ->
+                match reason with
+                | DismissalReason.Cancel -> AppMsg.InputResultMsg(Error "Clicked cancel")
+                | DismissalReason.Close -> AppMsg.InputResultMsg(Error "Clicked close button")
+                | DismissalReason.PressedEscape -> AppMsg.InputResultMsg(Error "Pressed escape")
+                | DismissalReason.TimedOut -> AppMsg.InputResultMsg(Error "Modal closed after timeout")
+                | DismissalReason.ClickedOutsideDialog -> AppMsg.InputResultMsg(Error "Clicked outside dialog")
 
         let inputAlert =
             InputAlert(handleInput)
@@ -232,18 +233,20 @@ let update msg state  =
     | SelectAlertMsg ->
 
         let options =
-            [  "coffee", "Coffee Driven Development"
-               "domain", "Domain Driven Developement"
-               "test", "Test Driven Developement" ]
+            [ "coffee", "Coffee Driven Development"
+              "domain", "Domain Driven Developement"
+              "test", "Test Driven Developement" ]
             |> Map.ofList
 
-        let validate = function
+        let validate =
+            function
             | (key, value) when key <> "coffee" -> Error "Nope"
-            | (key, value) -> Ok (key, value)
+            | (key, value) -> Ok(key, value)
 
-        let handleInput = function
-        | SelectAlertResult.Confirmed (key, value) -> AppMsg.SelectAlertConfirmed (key, value)
-        | SelectAlertResult.Dismissed reason -> AppMsg.InputResultMsg (Error "Dismissed")
+        let handleInput =
+            function
+            | SelectAlertResult.Confirmed (key, value) -> AppMsg.SelectAlertConfirmed(key, value)
+            | SelectAlertResult.Dismissed reason -> AppMsg.InputResultMsg(Error "Dismissed")
 
         let alert =
             SelectAlert(options, handleInput)
@@ -257,19 +260,29 @@ let update msg state  =
         let alert = SimpleAlert("Everyone loves " + value).Type(AlertType.Success)
         state, SweetAlert.Run(alert)
 
-let simplestAlert = """
+let simplestAlert =
+    """
 | SimplestAlert ->
     let alert = SimpleAlert("Simple but sweet")
     state, SweetAlert.Run(alert)
 """
 
-let simplestAlertWithTitle = """
+let simplestAlertWithTitle =
+    """
 | SimpleAlertWithTitle ->
     let alert = SimpleAlert("Is that still a thing?").Title("The Internet")
     state, SweetAlert.Run(alert)
 """
 
-let successAlert = """
+let simplestAlertWithHtml =
+    """
+| SimplestAlert ->
+    let alert = SimpleAlert("").Html("<h1 style="color: red">Simple but sweet</h1>")
+    state, SweetAlert.Run(alert)
+"""
+
+let successAlert =
+    """
 | SuccessAlert ->
     let successAlert =
         SimpleAlert("Your account has been succesfully created!")
@@ -279,7 +292,8 @@ let successAlert = """
     state, SweetAlert.Run(successAlert)
 """
 
-let selectAlertMsg = """
+let selectAlertMsg =
+    """
 | SelectAlertMsg ->
 
     let options =
@@ -309,7 +323,8 @@ let selectAlertMsg = """
     state, SweetAlert.Run(alert)
 """
 
-let hideConfirm = """
+let hideConfirm =
+    """
 | HideConfirm ->
     let successAlert =
         SimpleAlert("You have levelled up!")
@@ -321,7 +336,8 @@ let hideConfirm = """
     state, SweetAlert.Run(successAlert)
 """
 
-let timeout = """
+let timeout =
+    """
 | Timeout ->
     let errorAlert =
         SimpleAlert("That didn't go as we expected")
@@ -332,7 +348,8 @@ let timeout = """
     state, SweetAlert.Run(errorAlert)
 """
 
-let confirmAlertMsg = """
+let confirmAlertMsg =
+    """
 | ConfirmAlertMsg ->
     // map user action to application message, whether they confirm the dialog or not
     // if the dialog is dismissed, you can handle each dismissal reason
@@ -372,7 +389,8 @@ let confirmAlertMsg = """
     state, SweetAlert.Run(errorAlert)
 """
 
-let customConfirmBtnText = """
+let customConfirmBtnText =
+    """
 | CustomConfirmBtnText ->
     let alert =
         SimpleAlert("We are going to launch the missiles")
@@ -383,7 +401,8 @@ let customConfirmBtnText = """
     state, SweetAlert.Run(alert)
 """
 
-let scrollbarPaddingFalseText = """
+let scrollbarPaddingFalseText =
+    """
 | ScrollbarPaddingFalse ->
     let alert =
         SimpleAlert("A simple alert without padding")
@@ -392,7 +411,8 @@ let scrollbarPaddingFalseText = """
     state, SweetAlert.Run(alert)
 """
 
-let withImage = """
+let withImage =
+    """
 | WithImage ->
     let alert =
         SimpleAlert("Modal with a custom image.")
@@ -405,7 +425,8 @@ let withImage = """
     state, SweetAlert.Run(alert)
 """
 
-let inputAlertMsg = """
+let inputAlertMsg =
+    """
 | InputAlertMsg ->
 
     let validate input =
@@ -442,7 +463,8 @@ let inputAlertMsg = """
     state, SweetAlert.Run(errorAlert)
 """
 
-let confirmToastAlert = """
+let confirmToastAlert =
+    """
 | ConfirmToastAlertMsg ->
     let handleConfirm = function
     | ConfirmAlertResult.Confirmed -> AppMsg.ConfirmResultMsg (Ok "You confirmed")
@@ -457,7 +479,9 @@ let confirmToastAlert = """
 
     state, SweetAlert.Run(confirmAlert)
 """
-let simpleToastAlert = """
+
+let simpleToastAlert =
+    """
 | SimpleToastAlert ->
     let toastAlert =
         ToastAlert("Things about to go down")
@@ -469,7 +493,9 @@ let simpleToastAlert = """
 
     state, SweetAlert.Run(toastAlert)
 """
-let toastTopConfirm = """
+
+let toastTopConfirm =
+    """
 | ToastTopConfirm ->
     let toastAlert =
         ToastAlert("Things are going good!")
@@ -479,13 +505,17 @@ let toastTopConfirm = """
 
     state, SweetAlert.Run(toastAlert)
 """
-let closeButtonSample = """
+
+let closeButtonSample =
+    """
 Toastr.message "I have a close button"
 |> Toastr.title "Close"
 |> Toastr.showCloseButton
 |> Toastr.error
 """
-let interactive = """
+
+let interactive =
+    """
 | Interactive ->
     let cmd =
         Toastr.message "Click me to dispatch 'Clicked' message"
@@ -503,282 +533,310 @@ let interactive = """
 """
 
 let renderSimpleAlert dispatch =
-    div [ Style [ Padding 20 ] ] [
-        h3 [ ] [ str "SimpleAlert API" ]
-        p [ ] [ str "SimpleAlert lets you create highly customizable SweetAlert modals that show information. " ]
-        br [ ]
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch SimplestAlert) ]
-                    [ str "dispatch SimplestAlert" ]
-            ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "SimpleAlert API" ]
+          p [] [ str "SimpleAlert lets you create highly customizable SweetAlert modals that show information. " ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SimplestAlert) ]
+                          [ str "dispatch SimplestAlert" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str simplestAlert ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str simplestAlert ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch SimpleAlertWithTitle) ]
-                    [ str "dispatch SimpleAlertWithTitle" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SimpleAlertWithTitle) ]
+                          [ str "dispatch SimpleAlertWithTitle" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str simplestAlertWithTitle ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str simplestAlertWithTitle ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch SuccessAlert) ]
-                    [ str "dispatch SuccessAlert" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SimpleAlertWithHtml) ]
+                          [ str "dispatch SimpleAlertWithHtml" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str successAlert ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str simplestAlertWithHtml ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch Timeout) ]
-                    [ str "dispatch Timeout" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SuccessAlert) ]
+                          [ str "dispatch SuccessAlert" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str timeout ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str successAlert ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch HideConfirm) ]
-                    [ str "dispatch HideConfirm" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch Timeout) ] [ str "dispatch Timeout" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str hideConfirm ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str timeout ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch WithImage) ]
-                    [ str "dispatch WithImage" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch HideConfirm) ]
+                          [ str "dispatch HideConfirm" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str withImage ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str hideConfirm ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch CustomConfirmBtnText) ]
-                    [ str "dispatch CustomConfirmBtnText" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch WithImage) ]
+                          [ str "dispatch WithImage" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str customConfirmBtnText ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str withImage ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch ScrollbarPaddingFalse) ]
-                    [ str "dispatch ScrollbarPaddingFalse" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch CustomConfirmBtnText) ]
+                          [ str "dispatch CustomConfirmBtnText" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str scrollbarPaddingFalseText ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str customConfirmBtnText ] ] ] ]
 
-    ]
+          hr []
+
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch ScrollbarPaddingFalse) ]
+                          [ str "dispatch ScrollbarPaddingFalse" ] ]
+
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str scrollbarPaddingFalseText ] ] ] ]
+
+          ]
 
 let renderToastAlert dispatch =
-    div [ Style [ Padding 20 ] ] [
-        h3 [ ] [ str "ToastAlert API" ]
-        p [ ] [ str "ToastAlert lets you create modals that look and act like notification toasts" ]
-        br [ ]
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch SimpleToastAlert) ]
-                    [ str "dispatch SimpleToastAlert" ]
-            ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "ToastAlert API" ]
+          p [] [ str "ToastAlert lets you create modals that look and act like notification toasts" ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SimpleToastAlert) ]
+                          [ str "dispatch SimpleToastAlert" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str simpleToastAlert ] ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str simpleToastAlert ] ] ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch ToastTopConfirm) ]
-                    [ str "dispatch ToastTopConfirm" ]
-            ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch ToastTopConfirm) ]
+                          [ str "dispatch ToastTopConfirm" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str toastTopConfirm ] ]
-            ]
-        ]
-    ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str toastTopConfirm ] ] ] ] ]
 
 
 let renderConfirmAlert dispatch =
-    div [ Style [ Padding 20 ] ] [
-        h3 [ ] [ str "ConfirmAlert API" ]
-        p [ ] [ str "ConfirmAlert lets create modals that have both \"OK\" and \"Cancel\" buttons and be able to dispatch messages based on the action the user takes." ]
-        p [ ] [ str "The following example demonstrates the whole story" ]
-        br [ ]
-        div [ ClassName "row"; ] [
-            div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                div [ ClassName "btn btn-info";
-                      OnClick (fun _ -> dispatch ConfirmAlertMsg ) ]
-                    [ str "dispatch ConfirmAlertMsg" ]
-            ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "ConfirmAlert API" ]
+          p
+              []
+              [ str
+                    "ConfirmAlert lets create modals that have both \"OK\" and \"Cancel\" buttons and be able to dispatch messages based on the action the user takes." ]
+          p [] [ str "The following example demonstrates the whole story" ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch ConfirmAlertMsg) ]
+                          [ str "dispatch ConfirmAlertMsg" ] ]
 
-            div [ ClassName "col-md-9" ] [
-                code [ ] [ pre [ ] [ str confirmAlertMsg ] ]
-            ]
-        ]
-    ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str confirmAlertMsg ] ] ] ] ]
 
 
 let renderInputAlert dispatch =
-        div [ Style [ Padding 20 ] ] [
-            h3 [ ] [ str "InputAlert API" ]
-            p [ ] [ str "InputAlert lets create modals that have textual input with validation capabilities, along with the \"OK\" and \"Cancel\" buttons. "]
-            br [ ]
-            div [ ClassName "row"; ] [
-                div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                    div [ ClassName "btn btn-info";
-                          OnClick (fun _ -> dispatch InputAlertMsg ) ]
-                        [ str "dispatch InputAlertMsg" ]
-                ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "InputAlert API" ]
+          p
+              []
+              [ str
+                    "InputAlert lets create modals that have textual input with validation capabilities, along with the \"OK\" and \"Cancel\" buttons. " ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch InputAlertMsg) ]
+                          [ str "dispatch InputAlertMsg" ] ]
 
-                div [ ClassName "col-md-9" ] [
-                    code [ ] [ pre [ ] [ str inputAlertMsg ] ]
-                ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str inputAlertMsg ] ] ] ] ]
 
 let renderSelectAlert dispatch =
-        div [ Style [ Padding 20 ] ] [
-            h3 [ ] [ str "SelectAlert API" ]
-            p [ ] [ str "SelectAlert lets create modals where the user can select from a dropdown. Like InputAlert, it also has validation capabilities, along with the \"OK\" and \"Cancel\" buttons. "]
-            br [ ]
-            div [ ClassName "row"; ] [
-                div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                    div [ ClassName "btn btn-info";
-                          OnClick (fun _ -> dispatch SelectAlertMsg ) ]
-                        [ str "dispatch SelectAlertMsg" ]
-                ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "SelectAlert API" ]
+          p
+              []
+              [ str
+                    "SelectAlert lets create modals where the user can select from a dropdown. Like InputAlert, it also has validation capabilities, along with the \"OK\" and \"Cancel\" buttons. " ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch SelectAlertMsg) ]
+                          [ str "dispatch SelectAlertMsg" ] ]
 
-                div [ ClassName "col-md-9" ] [
-                    code [ ] [ pre [ ] [ str selectAlertMsg ] ]
-                ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str selectAlertMsg ] ] ] ] ]
 
 let renderConfirmToastAlert dispatch =
-        div [ Style [ Padding 20 ] ] [
-            h3 [ ] [ str "ConfirmToastAlert API" ]
-            p [ ] [ str "Combines ConfirmAlert with ToastAlert functionality"]
-            br [ ]
-            div [ ClassName "row"; ] [
-                div [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ] [
-                    div [ ClassName "btn btn-info";
-                          OnClick (fun _ -> dispatch ConfirmToastAlertMsg ) ]
-                        [ str "dispatch ConfirmToastAlertMsg" ]
-                ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ h3 [] [ str "ConfirmToastAlert API" ]
+          p [] [ str "Combines ConfirmAlert with ToastAlert functionality" ]
+          br []
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName "col-md-3"; Style [ PaddingTop 20 ] ]
+                    [ div
+                          [ ClassName "btn btn-info"; OnClick(fun _ -> dispatch ConfirmToastAlertMsg) ]
+                          [ str "dispatch ConfirmToastAlertMsg" ] ]
 
-                div [ ClassName "col-md-9" ] [
-                    code [ ] [ pre [ ] [ str confirmToastAlert ] ]
-                ]
-            ]
-        ]
+                div [ ClassName "col-md-9" ] [ code [] [ pre [] [ str confirmToastAlert ] ] ] ] ]
 
 let render state dispatch =
     let currentDocs =
-      match state with
-      | SimpleAlertDocs -> renderSimpleAlert dispatch
-      | ToastAlertDocs -> renderToastAlert dispatch
-      | ConfirmAlertDocs -> renderConfirmAlert dispatch
-      | InputAlertDocs -> renderInputAlert dispatch
-      | SelectAlertDocs -> renderSelectAlert dispatch
-      | ConfirmToastAlertDocs -> renderConfirmToastAlert dispatch
-      | _ -> h1 [ ] [ str "Unknown API" ]
+        match state with
+        | SimpleAlertDocs -> renderSimpleAlert dispatch
+        | ToastAlertDocs -> renderToastAlert dispatch
+        | ConfirmAlertDocs -> renderConfirmAlert dispatch
+        | InputAlertDocs -> renderInputAlert dispatch
+        | SelectAlertDocs -> renderSelectAlert dispatch
+        | ConfirmToastAlertDocs -> renderConfirmToastAlert dispatch
+        | _ -> h1 [] [ str "Unknown API" ]
 
-    div [ Style [ Padding 20 ] ] [
-        span [ ] [
-            h2 [ ] [ str "Elmish.SweetAlert docs" ]
-            a [ Href "https://sweetalert2.github.io/" ] [ str "SweetAlert2" ]
-            str " integration in Fable, made with <Heart /> by "
-            a [ Href "https://github.com/Zaid-Ajaj" ] [ str "Zaid-Ajaj" ]
-            str ". Implemented as Elmish commands, for installation instructions see the repo at "
-            a [ Href "https://github.com/Zaid-Ajaj/Elmish.SweetAlert" ] [ str "github." ]
-        ]
+    div
+        [ Style [ Padding 20 ] ]
+        [ span
+              []
+              [ h2 [] [ str "Elmish.SweetAlert docs" ]
+                a [ Href "https://sweetalert2.github.io/" ] [ str "SweetAlert2" ]
+                str " integration in Fable, made with <Heart /> by "
+                a [ Href "https://github.com/Zaid-Ajaj" ] [ str "Zaid-Ajaj" ]
+                str ". Implemented as Elmish commands, for installation instructions see the repo at "
+                a [ Href "https://github.com/Zaid-Ajaj/Elmish.SweetAlert" ] [ str "github." ] ]
 
-        hr [ ]
+          hr []
 
-        div [ ClassName "row" ] [
-            div [ ClassName (if state = SimpleAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToSimpleAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ] ]
-                [ str "SimpleAlert" ]
-            div [ ClassName (if state = ToastAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToToastAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ]  ]
-                [ str "ToastAlert" ]
-            div [ ClassName (if state = ConfirmAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToConfirmAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ]  ]
-                [ str "ConfirmAlert" ]
-            div [ ClassName (if state = ConfirmToastAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToConfirmToastAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ]  ]
-                [ str "ConfirmToastAlert" ]
-            div [ ClassName (if state = InputAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToInputAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ]  ]
-                [ str "InputAlert" ]
-            div [ ClassName (if state = SelectAlertDocs then "btn btn-success" else "btn btn-secondary")
-                  OnClick (fun _ -> dispatch SwitchToSelectAlertDocs)
-                  Style [ Height 70; Padding 20; Margin 10 ]  ]
-                [ str "SelectAlert" ]
-        ]
+          div
+              [ ClassName "row" ]
+              [ div
+                    [ ClassName(
+                          if state = SimpleAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToSimpleAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "SimpleAlert" ]
+                div
+                    [ ClassName(
+                          if state = ToastAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToToastAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "ToastAlert" ]
+                div
+                    [ ClassName(
+                          if state = ConfirmAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToConfirmAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "ConfirmAlert" ]
+                div
+                    [ ClassName(
+                          if state = ConfirmToastAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToConfirmToastAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "ConfirmToastAlert" ]
+                div
+                    [ ClassName(
+                          if state = InputAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToInputAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "InputAlert" ]
+                div
+                    [ ClassName(
+                          if state = SelectAlertDocs then
+                              "btn btn-success"
+                          else
+                              "btn btn-secondary"
+                      )
+                      OnClick(fun _ -> dispatch SwitchToSelectAlertDocs)
+                      Style [ Height 70; Padding 20; Margin 10 ] ]
+                    [ str "SelectAlert" ] ]
 
-        br [ ]
-        currentDocs
-    ]
+          br []
+          currentDocs ]
 
 Program.mkProgram init update render
 |> Program.withReactSynchronous "root"
